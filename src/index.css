@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'anta';
+  src: url('./Resources/Fonts/Anta.ttf');
+}
+
+@font-face {
+  font-family: 'roboto';
+  src: url('./Resources/Fonts/Roboto.ttf');
+}
+
+@layer base {
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number'] {
+    -webkit-appearance: none;
+    margin: 0;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+  }
+}
