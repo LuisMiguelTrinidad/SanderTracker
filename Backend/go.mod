@@ -3,6 +3,8 @@ module github.com/LuisMiguelTrinidad/Sandertracker
 go 1.23.5
 
 require (
+	github.com/gofiber/contrib/jwt v1.0.10
+	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.5.1
 	go.mongodb.org/mongo-driver v1.17.2
@@ -11,8 +13,6 @@ require (
 require (
 	github.com/MicahParks/keyfunc/v2 v2.1.0 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
-	github.com/gofiber/contrib/jwt v1.0.10 // indirect
-	github.com/gofiber/fiber/v2 v2.52.6 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
