@@ -6,8 +6,6 @@ import Book from '../../Types/Book';
 const BookCard: FC<{ book: Book }> = ({ book }) => {
     const [progress, setProgress] = useState<number>(0);
     const progressPercentage = (progress / book.pages) * 100;
-
-    console.log(progressPercentage);
     
     return (
         <div className='flex flex-col space-y-4'>
@@ -28,14 +26,25 @@ const BookCard: FC<{ book: Book }> = ({ book }) => {
                         <img className='rounded-md' src={book.cover} alt={book.title} />
                     </div>
                     <div className='flex justify-center space-x-2 font-Anta'>
-                        <input className='flex-1 h-10 min-w-0 p-2 text-2xl leading-none text-center rounded-md bg-slate-700' type="number" max={book.pages} min={0} value={progress} onChange={k => setProgress(Number(k.target.value))}/>
-                        <p className='flex-none text-4xl font-bold transition-all duration-1000 group-hover:text-orange-300'>/</p>
-                        <input className='flex-1 h-10 min-w-0 p-2 text-2xl leading-none text-center rounded-md bg-slate-900' type="number" value={book.pages} readOnly />
+                        <input 
+                            className='flex-1 h-10 min-w-0 p-2 text-2xl leading-none text-center rounded-md bg-slate-700' 
+                            type="number" 
+                            max={book.pages} 
+                            min={0} 
+                            value={progress} 
+                            onChange={k => setProgress(Math.min(Number(k.target.value), book.pages))}
+                        />
+                        <p className='flex-none text-4xl font-bold transition-all duration-1000 group-hover:text-orange-300'>
+                            /
+                        </p>
+                        <div className='flex-1 h-10 min-w-0 p-2 text-2xl leading-none text-center rounded-md bg-slate-900'>
+                            {book.pages}
+                        </div>
                     </div>
                 </div>
             </div>
             <div className='box-border flex h-10 border-4 rounded-xl'>
-            <div className="h-full bg-orange-300 rounded-lg" style={{ width: `${progressPercentage}%` }}></div>
+                <div className="h-full bg-orange-300 rounded-md" style={{ width: `${progressPercentage}%` }}></div>
             </div>
         </div>
     )
