@@ -11,6 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var Db *mongo.Database
+
 type MongoConfig struct {
 	UserName string
 	Password string
@@ -45,36 +47,37 @@ func LoadMongoConfig() (*MongoConfig, error) {
 	return cfg, nil
 }
 
-func InitMongoDB() (*mongo.Client, error) {
+func InitMongoDB() error {
 	cfg, err := LoadMongoConfig()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(
-		fmt.Sprintf("mongodb+srv://%s:%s@demo.veati.mongodb.net/?retryWrites=true&w=majority&appName=%s",
-			cfg.UserName, cfg.Password, cfg.DBName)).SetServerAPIOptions(serverAPI)
+		fmt.Sprintf("mongodb+srv://%s:%s@demo.veati.mongodb.net/?retryWrites=true&w=majority",
+			cfg.UserName, cfg.Password)).SetServerAPIOptions(serverAPI)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to MongoDB: %v", err)
+		return fmt.Errorf("error connecting to MongoDB: %v", err)
 	}
 
 	if err = client.Ping(ctx, nil); err != nil {
-		return nil, fmt.Errorf("error pinging MongoDB: %v", err)
+		return fmt.Errorf("error pinging MongoDB: %v", err)
 	}
 
+	Db = client.Database(cfg.DBName)
 	fmt.Println("Connected to MongoDB!")
-	return client, nil
+	return nil
 }
 
-func CloseMongoDB(client *mongo.Client) {
-	if client != nil {
-		if err := client.Disconnect(context.TODO()); err != nil {
+func CloseMongoDB() {
+	if Db != nil {
+		if err := Db.Client().Disconnect(context.Background()); err != nil {
 			panic(fmt.Errorf("error disconnecting from MongoDB: %v", err))
 		}
 		fmt.Println("Disconnected from MongoDB")

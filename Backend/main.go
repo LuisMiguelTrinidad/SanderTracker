@@ -13,11 +13,11 @@ import (
 func main() {
 	app := fiber.New()
 	app.Use(cors.New())
-	client, err := config.InitMongoDB()
+	err := config.InitMongoDB()
 	if err != nil {
 		panic(err)
 	}
-	defer config.CloseMongoDB(client)
+	defer config.CloseMongoDB()
 
 	router.SetupRoutes(app)
 	log.Fatal(app.Listen(":3000"))
