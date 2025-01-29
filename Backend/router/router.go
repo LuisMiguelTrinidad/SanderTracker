@@ -6,9 +6,11 @@ import (
 )
 
 func SetupRoutes(app *fiber.App) {
-	app.Get("/api/v1/books", controllers.GetBooks)
-	app.Get("/api/v1/books/:id", controllers.GetBook)
-	app.Post("/api/v1/books", controllers.NewBook)
-	app.Delete("/api/v1/books/:id", controllers.DeleteBook)
-	app.Put("/api/v1/books/:id", controllers.UpdateBook)
+	v1 := app.Group("/api/v1")
+
+	v1.Get("/books", controllers.GetBooks)
+	v1.Get("/books/:id", controllers.GetBook)
+	v1.Post("/books", controllers.CreateBook)
+	v1.Delete("/books/:id", controllers.DeleteBook)
+	v1.Put("/books/:id", controllers.UpdateBook)
 }

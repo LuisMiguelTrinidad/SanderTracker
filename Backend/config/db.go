@@ -43,7 +43,7 @@ func LoadMongoConfig() (*MongoConfig, error) {
 	if len(missingVars) > 0 {
 		return nil, fmt.Errorf("missing required environment variables: %v", missingVars)
 	}
-
+	fmt.Println("Loaded MongoDB config from environment variables")
 	return cfg, nil
 }
 
@@ -58,7 +58,7 @@ func InitMongoDB() error {
 		fmt.Sprintf("mongodb+srv://%s:%s@demo.veati.mongodb.net/?retryWrites=true&w=majority",
 			cfg.UserName, cfg.Password)).SetServerAPIOptions(serverAPI)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, opts)

@@ -7,11 +7,11 @@ import (
 )
 
 type Book struct {
-	Id          primitive.ObjectID `json:"id"`
-	Title       string             `json:"title"`
-	Author      string             `json:"author"`
-	Cover       string             `json:"cover"`
-	Pages       int                `json:"pages"`
-	Isbn        int                `json:"isbn"`
-	PublishDate time.Time          `json:"publishDate"`
+	Id          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Title       string             `json:"title" bson:"title"`
+	Author      string             `json:"author" bson:"author"`
+	Cover       string             `json:"cover" bson:"cover"`
+	Pages       int                `json:"pages" bson:"pages"`
+	Isbn        string             `json:"isbn" bson:"isbn"`
+	PublishDate time.Time          `json:"publishDate" bson:"publishDate"`
 }
