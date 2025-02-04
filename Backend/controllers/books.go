@@ -4,23 +4,23 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
 	"github.com/LuisMiguelTrinidad/Sandertracker/config"
 	"github.com/LuisMiguelTrinidad/Sandertracker/models"
+
+	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var books *mongo.Collection
 
-func InitializeControllers() error {
+func init() {
 	if config.Db == nil {
-		return fmt.Errorf("database connection not initialized")
+		panic("Database connection not initialized")
 	}
 	books = config.Db.Collection("Books")
-	return nil
+	fmt.Println("Books collection initialized")
 }
 
 func GetBooks(c *fiber.Ctx) error {

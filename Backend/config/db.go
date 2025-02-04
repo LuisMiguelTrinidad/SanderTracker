@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -47,10 +48,10 @@ func LoadMongoConfig() (*MongoConfig, error) {
 	return cfg, nil
 }
 
-func InitMongoDB() error {
+func init() {
 	cfg, err := LoadMongoConfig()
 	if err != nil {
-		return err
+		log.Fatalf("Failed to load MongoDB config: %v", err)
 	}
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
@@ -63,16 +64,15 @@ func InitMongoDB() error {
 
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		return fmt.Errorf("error connecting to MongoDB: %v", err)
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
 
 	if err = client.Ping(ctx, nil); err != nil {
-		return fmt.Errorf("error pinging MongoDB: %v", err)
+		log.Fatalf("Failed to ping MongoDB: %v", err)
 	}
 
 	Db = client.Database(cfg.DBName)
 	fmt.Println("Connected to MongoDB!")
-	return nil
 }
 
 func CloseMongoDB() {
