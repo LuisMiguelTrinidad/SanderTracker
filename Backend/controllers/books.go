@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,8 +13,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var books *mongo.Collection
+
+func InitializeControllers() error {
+	if config.Db == nil {
+		return fmt.Errorf("database connection not initialized")
+	}
+	books = config.Db.Collection("Books")
+	return nil
+}
+
 func GetBooks(c *fiber.Ctx) error {
-	var books *mongo.Collection = config.Db.Collection("Books")
 	cursor, err := books.Find(context.Background(), bson.D{})
 
 	if err != nil {
@@ -29,8 +39,6 @@ func GetBooks(c *fiber.Ctx) error {
 }
 
 func GetBook(c *fiber.Ctx) error {
-	var books *mongo.Collection = config.Db.Collection("Books")
-
 	objectId, err := primitive.ObjectIDFromHex(c.Params("id"))
 	if err != nil {
 		return c.Status(400).SendString("Invalid ID format")
@@ -48,7 +56,6 @@ func GetBook(c *fiber.Ctx) error {
 }
 
 func CreateBook(c *fiber.Ctx) error {
-	var books *mongo.Collection = config.Db.Collection("Books")
 	var book models.Book
 
 	if err := c.BodyParser(&book); err != nil {
@@ -64,8 +71,6 @@ func CreateBook(c *fiber.Ctx) error {
 }
 
 func DeleteBook(c *fiber.Ctx) error {
-	var books *mongo.Collection = config.Db.Collection("Books")
-
 	objectId, err := primitive.ObjectIDFromHex(c.Params("id"))
 	if err != nil {
 		return c.Status(400).SendString("Invalid ID format")
@@ -85,8 +90,6 @@ func DeleteBook(c *fiber.Ctx) error {
 }
 
 func UpdateBook(c *fiber.Ctx) error {
-	booksCollection := config.Db.Collection("Books")
-
 	objectID, err := primitive.ObjectIDFromHex(c.Params("id"))
 	if err != nil {
 		return c.Status(400).SendString("Invalid ID format")
@@ -103,7 +106,7 @@ func UpdateBook(c *fiber.Ctx) error {
 
 	update := bson.M{"$set": updateData}
 
-	result, err := booksCollection.UpdateOne(c.Context(), bson.D{{Key: "_id", Value: objectID}}, update)
+	result, err := books.UpdateOne(c.Context(), bson.D{{Key: "_id", Value: objectID}}, update)
 	if err != nil {
 		return c.Status(500).SendString("Failed to update book")
 	}
@@ -111,10 +114,5 @@ func UpdateBook(c *fiber.Ctx) error {
 	if result.MatchedCount == 0 {
 		return c.Status(fiber.StatusNotFound).SendString("Book not found")
 	}
-
-	return c.JSON(fiber.Map{
-		"message":       "Book updated successfully",
-		"matchedCount":  result.MatchedCount,
-		"modifiedCount": result.ModifiedCount,
-	})
+	return c.Status(200).SendString("Book updated")
 }
