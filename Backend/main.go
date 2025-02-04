@@ -20,7 +20,7 @@ func main() {
 
 	router.SetupRoutes(app)
 
-	utils.Logger.Info("Starting server on port 3000...")
+	utils.Logger.Error("Starting server on port 3000...")
 	if err := app.Listen(":3000"); err != nil {
 		utils.Logger.Fatalf("Failed to start server: %v", err)
 	}
