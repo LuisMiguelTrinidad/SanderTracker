@@ -1,8 +1,9 @@
 package router
 
 import (
-	"github.com/LuisMiguelTrinidad/Sandertracker/controllers"
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/LuisMiguelTrinidad/Sandertracker/controllers"
 )
 
 func SetupRoutes(app *fiber.App) {

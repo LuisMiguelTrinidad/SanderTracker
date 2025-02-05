@@ -6,10 +6,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
 )
 
 var Db *mongo.Database

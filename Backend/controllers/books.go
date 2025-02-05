@@ -3,14 +3,14 @@ package controllers
 import (
 	"context"
 
-	"github.com/LuisMiguelTrinidad/Sandertracker/config"
-	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
-	"github.com/LuisMiguelTrinidad/Sandertracker/models"
-
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/LuisMiguelTrinidad/Sandertracker/config"
+	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
+	"github.com/LuisMiguelTrinidad/Sandertracker/models"
 )
 
 var books *mongo.Collection

@@ -5,8 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
 	"github.com/golang-jwt/jwt/v5"
+
+	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
 )
 
 type CustomClaims struct {
