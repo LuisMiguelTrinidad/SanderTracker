@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/LuisMiguelTrinidad/Sandertracker/config"
+	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
 	"github.com/LuisMiguelTrinidad/Sandertracker/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,11 +16,8 @@ import (
 var books *mongo.Collection
 
 func init() {
-	if config.Db == nil {
-		panic("Database connection not initialized")
-	}
 	books = config.Db.Collection("Books")
-	fmt.Println("Books collection initialized")
+	logging.LogInfo("Books collection initialized")
 }
 
 func GetBooks(c *fiber.Ctx) error {

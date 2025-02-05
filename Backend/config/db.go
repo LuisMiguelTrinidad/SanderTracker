@@ -3,10 +3,10 @@ package config
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
+	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -22,7 +22,7 @@ type MongoConfig struct {
 
 func LoadMongoConfig() (*MongoConfig, error) {
 	if err := godotenv.Load(); err != nil {
-		return nil, fmt.Errorf("error loading .env file: %v", err)
+		logging.LogFatal(fmt.Sprintf("Failed to load .env file: %v", err))
 	}
 
 	cfg := &MongoConfig{
@@ -31,55 +31,53 @@ func LoadMongoConfig() (*MongoConfig, error) {
 		DBName:   os.Getenv("MONGODB_DBNAME"),
 	}
 
-	var missingVars []string
 	if cfg.UserName == "" {
-		missingVars = append(missingVars, "MONGODB_USERNAME")
+		logging.LogFatal(fmt.Sprintf("missing variable MONGODB_USERNAME from environment"))
 	}
 	if cfg.Password == "" {
-		missingVars = append(missingVars, "MONGODB_PASSWORD")
+		logging.LogFatal(fmt.Sprintf("missing variable MONGODB_PASSWORD from environment"))
 	}
 	if cfg.DBName == "" {
-		missingVars = append(missingVars, "MONGODB_DBNAME")
+		logging.LogFatal(fmt.Sprintf("missing variable MONGODB_DBNAME from environment"))
 	}
-	if len(missingVars) > 0 {
-		return nil, fmt.Errorf("missing required environment variables: %v", missingVars)
-	}
-	fmt.Println("Loaded MongoDB config from environment variables")
+	logging.LogInfo("Loaded MongoDB config from environment variables")
 	return cfg, nil
 }
 
 func init() {
 	cfg, err := LoadMongoConfig()
 	if err != nil {
-		log.Fatalf("Failed to load MongoDB config: %v", err)
+		logging.LogFatal(fmt.Sprintf("Failed to load MongoDB config: %v", err))
+		panic("")
 	}
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(
-		fmt.Sprintf("mongodb+srv://%s:%s@demo.veati.mongodb.net/?retryWrites=true&w=majority",
-			cfg.UserName, cfg.Password)).SetServerAPIOptions(serverAPI)
+		fmt.Sprintf("mongodb+srv://%s:%s@demo.veati.mongodb.net/?retryWrites=true&w=majority", cfg.UserName, cfg.Password),
+	).SetServerAPIOptions(serverAPI)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
+		logging.LogFatal(fmt.Sprintf("Failed to connect to MongoDB: %v", err))
 	}
 
 	if err = client.Ping(ctx, nil); err != nil {
-		log.Fatalf("Failed to ping MongoDB: %v", err)
+		logging.LogFatal(fmt.Sprintf("Failed to ping MongoDB: %v", err))
 	}
 
 	Db = client.Database(cfg.DBName)
-	fmt.Println("Connected to MongoDB!")
+	logging.LogInfo("Connected to MongoDB")
 }
 
 func CloseMongoDB() {
 	if Db != nil {
 		if err := Db.Client().Disconnect(context.Background()); err != nil {
-			panic(fmt.Errorf("error disconnecting from MongoDB: %v", err))
+			logging.LogError(fmt.Sprintf("error disconnecting from MongoDB: %v", err))
+			panic("")
 		}
-		fmt.Println("Disconnected from MongoDB")
+		logging.LogInfo("Disconnected from MongoDB")
 	}
 }

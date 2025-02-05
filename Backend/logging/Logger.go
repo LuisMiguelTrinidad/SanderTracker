@@ -1,4 +1,4 @@
-package utils
+package logging
 
 import (
 	"fmt"
@@ -12,6 +12,7 @@ import (
 var Logger *zap.SugaredLogger
 
 func init() {
+	os.Remove("server.log")
 	logFile, err := os.OpenFile("server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		panic("failed to open log file: " + err.Error())
@@ -32,7 +33,6 @@ func init() {
 		ConsoleSeparator: " ",
 	}
 
-	// Create two cores - one for console, one for file
 	consoleCore := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(encoderConfigLogFile),
 		zapcore.AddSync(logFile),
@@ -46,21 +46,21 @@ func init() {
 		EncodeLevel: func(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
 			switch l {
 			case zapcore.DebugLevel:
-				enc.AppendString("[ \x1b[36m" + l.CapitalString() + "\x1b[0m ]") // Cyan
+				enc.AppendString("[ \x1b[36m" + l.CapitalString() + "\x1b[0m ]")
 			case zapcore.InfoLevel:
-				enc.AppendString("[ \x1b[32m" + l.CapitalString() + "\x1b[0m ]") // Green
+				enc.AppendString("[ \x1b[32m" + l.CapitalString() + "\x1b[0m ]")
 			case zapcore.WarnLevel:
-				enc.AppendString("[ \x1b[33m" + l.CapitalString() + "\x1b[0m ]") // Yellow
+				enc.AppendString("[ \x1b[33m" + l.CapitalString() + "\x1b[0m ]")
 			case zapcore.ErrorLevel:
-				enc.AppendString("[ \x1b[31m" + l.CapitalString() + "\x1b[0m ]") // Red
+				enc.AppendString("[ \x1b[31m" + l.CapitalString() + "\x1b[0m ]")
 			case zapcore.FatalLevel:
-				enc.AppendString("[ \x1b[35m" + l.CapitalString() + "\x1b[0m ]") // Magenta
+				enc.AppendString("[ \x1b[35m" + l.CapitalString() + "\x1b[0m ]")
 			default:
 				enc.AppendString("[ " + l.CapitalString() + " ]")
 			}
 		},
 		EncodeTime: func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-			enc.AppendString("[ \x1b[90m" + t.Format("2006-01-02 15:04:05") + "\x1b[0m ]") // Gray
+			enc.AppendString("[ \x1b[90m" + t.Format("2006-01-02 15:04:05") + "\x1b[0m ]")
 		},
 		EncodeDuration:   zapcore.SecondsDurationEncoder,
 		EncodeCaller:     zapcore.ShortCallerEncoder,
@@ -73,8 +73,36 @@ func init() {
 		zap.InfoLevel,
 	)
 
-	// Combine both cores using zapcore.NewTee
 	core := zapcore.NewTee(consoleCore, fileCore)
 
 	Logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar()
+}
+
+func WipeLogFile() {
+	os.Remove("server.log")
+}
+
+func CloseLogFile() {
+	Logger.Sync()
+}
+
+func LogError(msg string) {
+	Logger.Error(msg)
+}
+
+func LogInfo(msg string) {
+	Logger.Info(msg)
+}
+
+func LogWarn(msg string) {
+	Logger.Warn(msg)
+}
+
+func LogDebug(msg string) {
+	Logger.Debug(msg)
+}
+
+func LogFatal(msg string) {
+	Logger.Fatal(msg)
+	panic("")
 }

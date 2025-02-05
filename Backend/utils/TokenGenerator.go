@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -17,8 +18,9 @@ var secret string
 
 func init() {
 	secret = os.Getenv("ACC_JWT")
+	fmt.Println(secret)
 	if secret == "" {
-		panic("JWT secret not set")
+		logging.LogFatal("JWT secret not set")
 	}
 }
 
