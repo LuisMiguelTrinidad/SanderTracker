@@ -23,7 +23,7 @@ type MongoConfig struct {
 
 func LoadMongoConfig() (*MongoConfig, error) {
 	if err := godotenv.Load(); err != nil {
-		logging.LogFatal(fmt.Sprintf("Failed to load .env file: %v", err))
+		logging.SystemFatalLog(fmt.Sprintf("Failed to load .env file: %v", err))
 	}
 
 	cfg := &MongoConfig{
@@ -33,22 +33,22 @@ func LoadMongoConfig() (*MongoConfig, error) {
 	}
 
 	if cfg.UserName == "" {
-		logging.LogFatal(fmt.Sprintf("missing variable MONGODB_USERNAME from environment"))
+		logging.SystemFatalLog(fmt.Sprintf("missing variable MONGODB_USERNAME from environment"))
 	}
 	if cfg.Password == "" {
-		logging.LogFatal(fmt.Sprintf("missing variable MONGODB_PASSWORD from environment"))
+		logging.SystemFatalLog(fmt.Sprintf("missing variable MONGODB_PASSWORD from environment"))
 	}
 	if cfg.DBName == "" {
-		logging.LogFatal(fmt.Sprintf("missing variable MONGODB_DBNAME from environment"))
+		logging.SystemFatalLog(fmt.Sprintf("missing variable MONGODB_DBNAME from environment"))
 	}
-	logging.LogInfo("Loaded MongoDB config from environment variables")
+	logging.SystemInfoLog("Loaded MongoDB config from environment variables")
 	return cfg, nil
 }
 
 func init() {
 	cfg, err := LoadMongoConfig()
 	if err != nil {
-		logging.LogFatal(fmt.Sprintf("Failed to load MongoDB config: %v", err))
+		logging.SystemFatalLog(fmt.Sprintf("Failed to load MongoDB config: %v", err))
 		panic("")
 	}
 
@@ -62,23 +62,22 @@ func init() {
 
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		logging.LogFatal(fmt.Sprintf("Failed to connect to MongoDB: %v", err))
+		logging.SystemFatalLog(fmt.Sprintf("Failed to connect to MongoDB: %v", err))
 	}
 
 	if err = client.Ping(ctx, nil); err != nil {
-		logging.LogFatal(fmt.Sprintf("Failed to ping MongoDB: %v", err))
+		logging.SystemFatalLog(fmt.Sprintf("Failed to ping MongoDB: %v", err))
 	}
 
 	Db = client.Database(cfg.DBName)
-	logging.LogInfo("Connected to MongoDB")
+	logging.SystemInfoLog("Connected to MongoDB")
 }
 
 func CloseMongoDB() {
 	if Db != nil {
 		if err := Db.Client().Disconnect(context.Background()); err != nil {
-			logging.LogError(fmt.Sprintf("error disconnecting from MongoDB: %v", err))
-			panic("")
+			logging.SystemFatalLog(fmt.Sprintf("error disconnecting from MongoDB: %v", err))
 		}
-		logging.LogInfo("Disconnected from MongoDB")
+		logging.SystemInfoLog("Disconnected from MongoDB")
 	}
 }

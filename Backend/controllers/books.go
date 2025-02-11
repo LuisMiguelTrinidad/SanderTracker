@@ -17,7 +17,7 @@ var books *mongo.Collection
 
 func init() {
 	books = config.Db.Collection("Books")
-	logging.LogInfo("Books collection initialized")
+	logging.SystemInfoLog("Books collection initialized")
 }
 
 func GetBooks(c *fiber.Ctx) error {

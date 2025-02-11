@@ -6,12 +6,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/LuisMiguelTrinidad/Sandertracker/config"
-	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
-	"github.com/LuisMiguelTrinidad/Sandertracker/router"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+
+	"github.com/LuisMiguelTrinidad/Sandertracker/config"
+	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
+	"github.com/LuisMiguelTrinidad/Sandertracker/middleware"
+	"github.com/LuisMiguelTrinidad/Sandertracker/router"
 )
 
 func main() {
@@ -24,25 +25,28 @@ func main() {
 		DisableStartupMessage: true,
 	})
 	app.Use(cors.New())
+	app.Use(middleware.LogRequest)
 	defer config.CloseMongoDB()
 
 	router.SetupRoutes(app)
+
+	// Mover el middleware de logging al final
 
 	go func() {
 		port := os.Getenv("PORT")
 		if port == "" {
 			port = "3000"
 		}
-		logging.LogInfo(fmt.Sprintf("Starting server on port %s", port))
+		logging.SystemInfoLog(fmt.Sprintf("Starting server on port %s", port))
 		if err := app.Listen(":" + port); err != nil {
-			logging.LogFatal(fmt.Sprintf("Failed to start server: %v", err))
+			logging.SystemFatalLog(fmt.Sprintf("Failed to start server: %v", err))
 		}
 	}()
 
 	<-sigChan
-	logging.LogInfo("Shutting down server...")
+	logging.SystemInfoLog("Shutting down server...")
 
 	if err := app.Shutdown(); err != nil {
-		logging.LogFatal(fmt.Sprintf("Error during shutdown: %v", err))
+		logging.SystemFatalLog(fmt.Sprintf("Error during shutdown: %v", err))
 	}
 }

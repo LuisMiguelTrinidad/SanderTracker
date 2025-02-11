@@ -21,7 +21,7 @@ func init() {
 	secret = os.Getenv("ACC_JWT")
 	fmt.Println(secret)
 	if secret == "" {
-		logging.LogFatal("JWT secret not set")
+		logging.SystemFatalLog("JWT secret not set")
 	}
 }
 
