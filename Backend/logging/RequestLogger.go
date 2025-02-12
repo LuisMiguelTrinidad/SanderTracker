@@ -11,13 +11,11 @@ import (
 var requestLogger *zap.Logger
 
 func formatRequestMessage(msg, method string, status int) string {
-	methodColor := "\x1b[36m" // Cyan
-	statusColor := "\x1b[33m" // Yellow
 	resetColor := "\x1b[0m"
-
-	return fmt.Sprintf("[ %s%s%s ] [ %s%d%s ] %s",
-		methodColor, method, resetColor,
-		statusColor, status, resetColor,
+	padding := 6 - len(method)
+	return fmt.Sprintf("[ %s%s%s ]%*s [ %s%d%s ] %s",
+		MethodColor(method), method, resetColor, padding, "",
+		StatusColor(status), status, resetColor,
 		msg)
 }
 
@@ -46,10 +44,6 @@ func createRequestLogger() *zap.Logger {
 	)
 
 	return zap.New(core)
-}
-
-func init() {
-	requestLogger = createRequestLogger()
 }
 
 func RequestInfoLog(msg, method string, status int) {

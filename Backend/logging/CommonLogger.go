@@ -13,10 +13,13 @@ func init() {
 }
 
 func setupLogger() {
+	level := zapcore.DebugLevel
+
 	os.Remove("server.log")
 	logFile := openLogFile()
-	systemLogger = createLoggerWithCombinedCore(logFile)
+	systemLogger = createLoggerWithCombinedCore(logFile, level)
 	requestLogger = createRequestLogger()
+	SystemWarnLog("Wiping the previous log file")
 }
 
 func openLogFile() *os.File {
@@ -33,24 +36,18 @@ func CloseLogFile() {
 
 func createCustomEncoders(isColored bool) (zapcore.LevelEncoder, zapcore.TimeEncoder) {
 	levelEncoder := func(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
-		var color string
 		if isColored {
-			color = severityColors[l]
+			enc.AppendString(fmt.Sprintf("[ %s%s\x1b[0m ]", LevelColor(l.CapitalString()), l.CapitalString()))
 		} else {
-			color = ""
+			enc.AppendString(fmt.Sprintf("[ %s ]", l.CapitalString()))
 		}
-		enc.AppendString(fmt.Sprintf("[ %s%s\x1b[0m ]", color, l.CapitalString()))
 	}
-
 	timeEncoder := func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-		var timeStr string
 		if isColored {
-			timeStr = "[ \x1b[90m" + t.Format("2006-01-02 15:04:05") + "\x1b[0m ]"
+			enc.AppendString(fmt.Sprintf("[ \x1b[90m%v\x1b[0m ]", t.Format("2006-01-02 15:04:05")))
 		} else {
-			timeStr = "[ " + t.Format("2006-01-02 15:04:05") + " ]"
+			enc.AppendString(fmt.Sprintf("[ %v ]", t.Format("2006-01-02 15:04:05")))
 		}
-		enc.AppendString(timeStr)
 	}
-
 	return levelEncoder, timeEncoder
 }

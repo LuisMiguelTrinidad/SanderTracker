@@ -9,7 +9,6 @@ import (
 
 var systemLogger *zap.Logger
 
-// Logger configs for file and console remain the same
 func createBaseEncoderConfig(levelEncoder zapcore.LevelEncoder, timeEncoder zapcore.TimeEncoder) zapcore.EncoderConfig {
 	return zapcore.EncoderConfig{
 		TimeKey:          "timestamp",
@@ -21,23 +20,14 @@ func createBaseEncoderConfig(levelEncoder zapcore.LevelEncoder, timeEncoder zapc
 	}
 }
 
-// Auxiliary functions remain the same
-var severityColors = map[zapcore.Level]string{
-	zapcore.DebugLevel: "\x1b[36m",
-	zapcore.InfoLevel:  "\x1b[32m",
-	zapcore.WarnLevel:  "\x1b[33m",
-	zapcore.ErrorLevel: "\x1b[31m",
-	zapcore.FatalLevel: "\x1b[35m",
-}
-
 // Modified to return regular logger instead of sugared
-func createLoggerWithCombinedCore(logFile *os.File) *zap.Logger {
+func createLoggerWithCombinedCore(logFile *os.File, level zapcore.Level) *zap.Logger {
 	fileLevelEncoder, FileTimeEncoder := createCustomEncoders(false)
 	fileEncoderConfig := createBaseEncoderConfig(fileLevelEncoder, FileTimeEncoder)
 	fileCore := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(fileEncoderConfig),
 		zapcore.AddSync(logFile),
-		zap.InfoLevel,
+		level,
 	)
 
 	consoleLevelEncoder, consoleTimeEncoder := createCustomEncoders(true)
@@ -46,14 +36,13 @@ func createLoggerWithCombinedCore(logFile *os.File) *zap.Logger {
 	consoleCore := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(consoleEncoderConfig),
 		zapcore.AddSync(os.Stdout),
-		zap.InfoLevel,
+		level,
 	)
 
 	combinedCore := zapcore.NewTee(fileCore, consoleCore)
 	return zap.New(combinedCore)
 }
 
-// Modified logging functions to use standard logger
 func SystemInfoLog(msg string) {
 	systemLogger.Info(msg)
 }
