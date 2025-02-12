@@ -45,7 +45,7 @@ func LoadMongoConfig() (*MongoConfig, error) {
 	return cfg, nil
 }
 
-func init() {
+func InitMongoDB() {
 	cfg, err := LoadMongoConfig()
 	if err != nil {
 		logging.SystemFatalLog(fmt.Sprintf("Failed to load MongoDB config: %v", err))

@@ -1,27 +1,23 @@
 package controllers
 
 import (
-	"context"
-
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/LuisMiguelTrinidad/Sandertracker/config"
-	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
 	"github.com/LuisMiguelTrinidad/Sandertracker/models"
 )
 
-var books *mongo.Collection
+var bookCollection *mongo.Collection
 
-func init() {
-	books = config.Db.Collection("Books")
-	logging.SystemInfoLog("Books collection initialized")
+func InitBooks() {
+	bookCollection = config.Db.Collection("books")
 }
 
 func GetBooks(c *fiber.Ctx) error {
-	cursor, err := books.Find(context.Background(), bson.D{})
+	cursor, err := bookCollection.Find(c.Context(), bson.D{})
 
 	if err != nil {
 		return c.Status(500).SendString("Error fetching books")
@@ -40,7 +36,7 @@ func GetBook(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).SendString("Invalid ID format")
 	}
-	cursor := books.FindOne(context.Background(), bson.D{{Key: "_id", Value: objectId}})
+	cursor := bookCollection.FindOne(c.Context(), bson.D{{Key: "_id", Value: objectId}})
 	if cursor.Err() != nil {
 		return c.Status(404).SendString("Book not found")
 	}
@@ -59,7 +55,7 @@ func CreateBook(c *fiber.Ctx) error {
 		return c.Status(400).SendString("Invalid request body")
 	}
 
-	result, err := books.InsertOne(context.Background(), book)
+	result, err := bookCollection.InsertOne(c.Context(), book)
 	if err != nil {
 		return c.Status(500).SendString("Failed to create book")
 	}
@@ -73,7 +69,7 @@ func DeleteBook(c *fiber.Ctx) error {
 		return c.Status(400).SendString("Invalid ID format")
 	}
 
-	result, err := books.DeleteOne(context.Background(), bson.D{{Key: "_id", Value: objectId}})
+	result, err := bookCollection.DeleteOne(c.Context(), bson.D{{Key: "_id", Value: objectId}})
 
 	if err != nil {
 		return c.Status(500).SendString("Error deleting book")
@@ -103,7 +99,7 @@ func UpdateBook(c *fiber.Ctx) error {
 
 	update := bson.M{"$set": updateData}
 
-	result, err := books.UpdateOne(c.Context(), bson.D{{Key: "_id", Value: objectID}}, update)
+	result, err := bookCollection.UpdateOne(c.Context(), bson.D{{Key: "_id", Value: objectID}}, update)
 	if err != nil {
 		return c.Status(500).SendString("Failed to update book")
 	}

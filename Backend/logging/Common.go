@@ -8,11 +8,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func init() {
-	setupLogger()
-}
-
-func setupLogger() {
+func InitLogger() {
 	level := zapcore.DebugLevel
 
 	os.Remove("server.log")
