@@ -1,4 +1,4 @@
-package config
+package database
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
+	"github.com/LuisMiguelTrinidad/Sandertracker/utils/logging"
 )
 
 var Db *mongo.Database

@@ -6,14 +6,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"github.com/LuisMiguelTrinidad/Sandertracker/config"
+	"github.com/LuisMiguelTrinidad/Sandertracker/database"
 	"github.com/LuisMiguelTrinidad/Sandertracker/models"
 )
 
 var bookCollection *mongo.Collection
 
 func InitBooks() {
-	bookCollection = config.Db.Collection("books")
+	bookCollection = database.Db.Collection("books")
 }
 
 func GetBooks(c *fiber.Ctx) error {

@@ -9,11 +9,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 
-	"github.com/LuisMiguelTrinidad/Sandertracker/config"
 	"github.com/LuisMiguelTrinidad/Sandertracker/controllers"
-	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
+	"github.com/LuisMiguelTrinidad/Sandertracker/database"
 	"github.com/LuisMiguelTrinidad/Sandertracker/middleware"
 	"github.com/LuisMiguelTrinidad/Sandertracker/router"
+	"github.com/LuisMiguelTrinidad/Sandertracker/utils/logging"
 )
 
 func setupServer() *fiber.App {
@@ -52,10 +52,10 @@ func gracefulShutdown(app *fiber.App) {
 
 func main() {
 	defer logging.CloseLogFile()
-	defer config.CloseMongoDB()
+	defer database.CloseMongoDB()
 
 	logging.InitLogger()
-	config.InitMongoDB()
+	database.InitMongoDB()
 
 	app := setupServer()
 	go startServer(app)

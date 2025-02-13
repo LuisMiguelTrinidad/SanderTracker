@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/LuisMiguelTrinidad/Sandertracker/logging"
+	"github.com/LuisMiguelTrinidad/Sandertracker/utils/logging"
 )
 
 func LogRequest(c *fiber.Ctx) error {
